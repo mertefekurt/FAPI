@@ -16,12 +16,19 @@ uvicorn app.main:app --reload
 
 ## API Endpoints
 
+### Authentication
 - `POST /auth/register` - Yeni kullanıcı kaydı
 - `POST /auth/login` - Giriş yap
 - `GET /auth/me` - Mevcut kullanıcı bilgileri
+
+### Roles
 - `POST /roles` - Yeni rol oluştur (admin gerekli)
 - `GET /roles` - Tüm rolleri listele
 - `GET /roles/{role_id}` - Rol detayı
 - `POST /roles/{role_id}/assign/{user_id}` - Kullanıcıya rol ata (admin gerekli)
 - `DELETE /roles/{role_id}/remove/{user_id}` - Kullanıcıdan rol kaldır (admin gerekli)
+
+### Users
+- `GET /users` - Tüm kullanıcıları listele (admin gerekli)
+- `GET /users/{user_id}` - Kullanıcı detayı
 
