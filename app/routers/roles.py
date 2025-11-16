@@ -17,12 +17,16 @@ def create_role(
     if db_role:
         raise HTTPException(status_code=400, detail="rol zaten mevcut")
     
-    db_role = models.Role(name=role.name, description=role.description)
-    db.add(db_role)
-    db.commit()
-    db.refresh(db_role)
-    print(f"yeni rol oluşturuldu: {role.name}")
-    return db_role
+    try:
+        db_role = models.Role(name=role.name, description=role.description)
+        db.add(db_role)
+        db.commit()
+        db.refresh(db_role)
+        print(f"yeni rol oluşturuldu: {role.name}")
+        return db_role
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="rol oluşturulurken hata oluştu")
 
 @router.get("", response_model=List[schemas.RoleResponse])
 def get_roles(
@@ -61,10 +65,14 @@ def assign_role_to_user(
     if role in user.roles:
         raise HTTPException(status_code=400, detail="kullanıcı zaten bu role sahip")
     
-    user.roles.append(role)
-    db.commit()
-    print(f"rol atandı: {user.username} -> {role.name}")
-    return {"message": "rol başarıyla atandı"}
+    try:
+        user.roles.append(role)
+        db.commit()
+        print(f"rol atandı: {user.username} -> {role.name}")
+        return {"message": "rol başarıyla atandı"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="rol atanırken hata oluştu")
 
 @router.delete("/{role_id}/remove/{user_id}")
 def remove_role_from_user(
@@ -84,8 +92,12 @@ def remove_role_from_user(
     if role not in user.roles:
         raise HTTPException(status_code=400, detail="kullanıcı bu role sahip değil")
     
-    user.roles.remove(role)
-    db.commit()
-    print(f"rol kaldırıldı: {user.username} -> {role.name}")
-    return {"message": "rol başarıyla kaldırıldı"}
+    try:
+        user.roles.remove(role)
+        db.commit()
+        print(f"rol kaldırıldı: {user.username} -> {role.name}")
+        return {"message": "rol başarıyla kaldırıldı"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="rol kaldırılırken hata oluştu")
 
