@@ -11,11 +11,15 @@ from app.auth import (
     get_password_hash,
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
+from app.validators import validate_password_strength, validate_username
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", response_model=schemas.UserResponse)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    validate_username(user.username)
+    validate_password_strength(user.password)
+    
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
     if db_user:
         raise HTTPException(status_code=400, detail="kullanıcı adı zaten kullanılıyor")
