@@ -1,10 +1,16 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from sqlalchemy.exc import IntegrityError
 from app.database import engine, Base
 from app.routers import auth, roles, users
+from app.exceptions import validation_exception_handler, integrity_error_handler
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Auth & Role Management API")
+
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(IntegrityError, integrity_error_handler)
 
 app.include_router(auth.router)
 app.include_router(roles.router)
