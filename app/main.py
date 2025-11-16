@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import IntegrityError
 from app.database import engine, Base
@@ -8,6 +9,14 @@ from app.exceptions import validation_exception_handler, integrity_error_handler
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Auth & Role Management API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(IntegrityError, integrity_error_handler)

@@ -4,6 +4,7 @@ from typing import List
 from app.database import get_db
 from app import models, schemas
 from app.auth import get_current_user, require_role
+from app.validators import validate_role_name
 
 router = APIRouter(prefix="/roles", tags=["roles"])
 
@@ -13,6 +14,7 @@ def create_role(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_role("admin"))
 ):
+    validate_role_name(role.name)
     db_role = db.query(models.Role).filter(models.Role.name == role.name).first()
     if db_role:
         raise HTTPException(status_code=400, detail="rol zaten mevcut")

@@ -30,3 +30,15 @@ def validate_username(username: str):
             detail="kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir"
         )
 
+def validate_role_name(role_name: str):
+    if len(role_name) < 2:
+        raise HTTPException(
+            status_code=400,
+            detail="rol adı en az 2 karakter olmalı"
+        )
+    if not re.match(r"^[a-zA-Z0-9_]+$", role_name):
+        raise HTTPException(
+            status_code=400,
+            detail="rol adı sadece harf, rakam ve alt çizgi içerebilir"
+        )
+
