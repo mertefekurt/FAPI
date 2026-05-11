@@ -1,22 +1,25 @@
 from datetime import timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from app.database import get_db
+
 from app import models, schemas
 from app.auth import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
     authenticate_user,
     create_access_token,
     get_current_user,
     get_password_hash,
-    ACCESS_TOKEN_EXPIRE_MINUTES
 )
+from app.database import get_db
 from app.validators import validate_password_strength, validate_username
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", response_model=schemas.UserResponse)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    """Register a new user after validating uniqueness and password strength."""
     validate_username(user.username)
     validate_password_strength(user.password)
     
@@ -40,12 +43,13 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
         db.refresh(db_user)
         print(f"yeni kullanıcı kaydedildi: {user.username}")
         return db_user
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(status_code=500, detail="kullanıcı kaydı sırasında hata oluştu")
 
 @router.post("/login", response_model=schemas.Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """Authenticate a user and return a bearer access token."""
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -62,5 +66,5 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
 
 @router.get("/me", response_model=schemas.UserResponse)
 async def read_users_me(current_user: models.User = Depends(get_current_user)):
+    """Return the authenticated user's profile."""
     return current_user
-

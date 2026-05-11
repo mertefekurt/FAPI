@@ -1,7 +1,9 @@
 import re
+
 from fastapi import HTTPException
 
 def validate_password_strength(password: str):
+    """Validate the minimum password length and character requirements."""
     if len(password) < 8:
         raise HTTPException(
             status_code=400,
@@ -19,6 +21,7 @@ def validate_password_strength(password: str):
         )
 
 def validate_username(username: str):
+    """Validate usernames accepted by the API."""
     if len(username) < 3:
         raise HTTPException(
             status_code=400,
@@ -31,6 +34,7 @@ def validate_username(username: str):
         )
 
 def validate_role_name(role_name: str):
+    """Validate role names accepted by the API."""
     if len(role_name) < 2:
         raise HTTPException(
             status_code=400,
@@ -41,4 +45,3 @@ def validate_role_name(role_name: str):
             status_code=400,
             detail="rol adı sadece harf, rakam ve alt çizgi içerebilir"
         )
-

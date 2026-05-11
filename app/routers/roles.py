@@ -1,9 +1,11 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
-from app.database import get_db
+
 from app import models, schemas
 from app.auth import get_current_user, require_role
+from app.database import get_db
 from app.validators import validate_role_name
 
 router = APIRouter(prefix="/roles", tags=["roles"])
@@ -12,8 +14,9 @@ router = APIRouter(prefix="/roles", tags=["roles"])
 def create_role(
     role: schemas.RoleCreate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(require_role("admin"))
+    _current_user: models.User = Depends(require_role("admin")),
 ):
+    """Create a role, guarded by the admin role dependency."""
     validate_role_name(role.name)
     db_role = db.query(models.Role).filter(models.Role.name == role.name).first()
     if db_role:
@@ -26,15 +29,16 @@ def create_role(
         db.refresh(db_role)
         print(f"yeni rol oluşturuldu: {role.name}")
         return db_role
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(status_code=500, detail="rol oluşturulurken hata oluştu")
 
 @router.get("", response_model=List[schemas.RoleResponse])
 def get_roles(
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    _current_user: models.User = Depends(get_current_user),
 ):
+    """Return all roles visible to an authenticated user."""
     roles = db.query(models.Role).all()
     return roles
 
@@ -42,8 +46,9 @@ def get_roles(
 def get_role(
     role_id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    _current_user: models.User = Depends(get_current_user),
 ):
+    """Return a single role by database id."""
     role = db.query(models.Role).filter(models.Role.id == role_id).first()
     if not role:
         raise HTTPException(status_code=404, detail="rol bulunamadı")
@@ -54,8 +59,9 @@ def assign_role_to_user(
     role_id: int,
     user_id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(require_role("admin"))
+    _current_user: models.User = Depends(require_role("admin")),
 ):
+    """Assign an existing role to an existing user."""
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="kullanıcı bulunamadı")
@@ -72,7 +78,7 @@ def assign_role_to_user(
         db.commit()
         print(f"rol atandı: {user.username} -> {role.name}")
         return {"message": "rol başarıyla atandı"}
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(status_code=500, detail="rol atanırken hata oluştu")
 
@@ -81,8 +87,9 @@ def remove_role_from_user(
     role_id: int,
     user_id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(require_role("admin"))
+    _current_user: models.User = Depends(require_role("admin")),
 ):
+    """Remove an existing role from an existing user."""
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="kullanıcı bulunamadı")
@@ -99,7 +106,6 @@ def remove_role_from_user(
         db.commit()
         print(f"rol kaldırıldı: {user.username} -> {role.name}")
         return {"message": "rol başarıyla kaldırıldı"}
-    except Exception as e:
+    except Exception:
         db.rollback()
         raise HTTPException(status_code=500, detail="rol kaldırılırken hata oluştu")
-

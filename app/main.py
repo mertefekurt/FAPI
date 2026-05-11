@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import IntegrityError
+
 from app.database import engine, Base
-from app.routers import auth, roles, users
 from app.exceptions import validation_exception_handler, integrity_error_handler
+from app.routers import auth, roles, users
 
 Base.metadata.create_all(bind=engine)
 
@@ -27,5 +28,5 @@ app.include_router(users.router)
 
 @app.get("/")
 def root():
+    """Return a lightweight health message for the API root."""
     return {"message": "auth ve role management api'si"}
-
