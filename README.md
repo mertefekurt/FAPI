@@ -1,23 +1,33 @@
 # FAPI
 
-FastAPI authentication and role-management service.
+| Detail | Value |
+| --- | --- |
+| Area | api contracts |
+| Entry | `uvicorn` |
+| Input | small local input |
+| Output | JSON API responses |
 
 ![FAPI cover](assets/readme-cover.svg)
 
-## Run
+FastAPI auth and role management starter.
+
+## Launch path
 
 ```bash
 git clone https://github.com/mertefekurt/FAPI.git
 cd FAPI
-python -m venv .venv
-source .venv/bin/activate
 python -m pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-## Surface
+## How it moves
 
-- `/auth/register`, `/auth/login`, `/auth/me`
-- role creation, listing, and assignment
-- admin-guarded user listing
-- SQLAlchemy models with SQLite persistence
+![Workflow diagram](assets/readme-diagram.svg)
+
+## Useful edges
+
+The project stays useful because of these small constraints:
+
+- Designed as a focused api contracts repo.
+- Keeps setup short.
+- Prioritizes readable output over infrastructure.
