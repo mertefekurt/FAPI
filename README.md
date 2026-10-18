@@ -1,17 +1,12 @@
-# FAPI
+# Fapi
 
-| Detail | Value |
-| --- | --- |
-| Area | api contracts |
-| Entry | `uvicorn` |
-| Input | small local input |
-| Output | JSON API responses |
+![Fapi cover](assets/readme-cover.svg)
 
-![FAPI cover](assets/readme-cover.svg)
+A focused Python project from Mert Efe Kurt.
 
-FastAPI auth and role management starter.
+`Python`
 
-## Launch path
+## Start here
 
 ```bash
 git clone https://github.com/mertefekurt/FAPI.git
@@ -20,14 +15,6 @@ python -m pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-## How it moves
+## Repository
 
-![Workflow diagram](assets/readme-diagram.svg)
-
-## Useful edges
-
-The project stays useful because of these small constraints:
-
-- Designed as a focused api contracts repo.
-- Keeps setup short.
-- Prioritizes readable output over infrastructure.
+[Open the source on GitHub →](https://github.com/mertefekurt/FAPI)
